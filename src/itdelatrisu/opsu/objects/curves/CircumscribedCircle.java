@@ -24,6 +24,7 @@ import itdelatrisu.opsu.OsuHitObject;
 import itdelatrisu.opsu.Utils;
 
 import org.newdawn.slick.Color;
+import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 
 /**
@@ -179,12 +180,17 @@ public class CircumscribedCircle extends Curve {
 	}
 
 	@Override
-	public void draw() {
-		Image hitCircle = GameImage.HITCIRCLE.getImage();
-		Image hitCircleOverlay = GameImage.HITCIRCLE_OVERLAY.getImage();
-		for (int i = 0; i < step; i++)
-			hitCircleOverlay.drawCentered(curve[i].x, curve[i].y, Utils.COLOR_WHITE_FADE);
-		for (int i = 0; i < step; i++)
+	public void draw(Graphics g) {
+		Image hitCircle = GameImage.SLIDER_CORE.getImage();
+		Image hitCircleOverlay = GameImage.SLIDER_BORDER.getImage();
+               g.setDrawMode(Graphics.MODE_ADD);
+               Color old = g.getColor();
+               g.setColor(Color.white);
+		 for (int i = 0; i < step-2; ++i)
+                        hitCircleOverlay.drawCentered(curve[i].x, curve[i].y, Color.white);
+               g.setColor(old);
+		g.setDrawMode(Graphics.MODE_ALPHA_BLEND);
+		for (int i = 0; i < step-2 ; ++i)
 			hitCircle.drawCentered(curve[i].x, curve[i].y, color);
 	}
 

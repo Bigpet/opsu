@@ -995,6 +995,7 @@ public class Game extends BasicGameState {
 			throws SlickException {
 		UI.enter();
 
+                Slider.SliderCache.getInstance().freeMap();
 		if (osu == null || osu.objects == null)
 			throw new RuntimeException("Running game with no OsuFile loaded.");
 

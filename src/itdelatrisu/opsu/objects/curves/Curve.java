@@ -21,6 +21,7 @@ package itdelatrisu.opsu.objects.curves;
 import itdelatrisu.opsu.OsuHitObject;
 
 import org.newdawn.slick.Color;
+import org.newdawn.slick.Graphics;
 
 /**
  * Representation of a curve.
@@ -64,7 +65,7 @@ public abstract class Curve {
 	/**
 	 * Draws the full curve to the graphics context.
 	 */
-	public abstract void draw();
+	public abstract void draw(Graphics g);
 
 	/**
 	 * Returns the angle of the first control point.

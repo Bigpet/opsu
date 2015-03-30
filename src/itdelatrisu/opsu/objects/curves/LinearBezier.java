@@ -26,6 +26,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 import org.newdawn.slick.Color;
+import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 
 /**
@@ -164,12 +165,17 @@ public class LinearBezier extends Curve {
 	}
 
 	@Override
-	public void draw() {
-		Image hitCircle = GameImage.HITCIRCLE.getImage();
-		Image hitCircleOverlay = GameImage.HITCIRCLE_OVERLAY.getImage();
-		for (int i = curve.length - 2; i >= 0; i--)
-			hitCircleOverlay.drawCentered(curve[i].x, curve[i].y, Utils.COLOR_WHITE_FADE);
-		for (int i = curve.length - 2; i >= 0; i--)
+	public void draw(Graphics g) {
+		Image hitCircle = GameImage.SLIDER_CORE.getImage();
+		Image hitCircleOverlay = GameImage.SLIDER_BORDER.getImage();
+               g.setDrawMode(Graphics.MODE_ADD);
+               Color old = g.getColor();
+               g.setColor(Color.white);
+		for (int i = 0 ; i <= curve.length-1; ++i)
+			hitCircleOverlay.drawCentered(curve[i].x, curve[i].y,Color.white);
+               g.setColor(old);
+                g.setDrawMode(Graphics.MODE_NORMAL);
+		for (int i = 0 ; i <= curve.length-1; ++i)
 			hitCircle.drawCentered(curve[i].x, curve[i].y, color);
 	}
 

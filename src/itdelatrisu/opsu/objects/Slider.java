@@ -18,9 +18,11 @@
 
 package itdelatrisu.opsu.objects;
 
+import itdelatrisu.opsu.ErrorHandler;
 import itdelatrisu.opsu.GameData;
 import itdelatrisu.opsu.GameImage;
 import itdelatrisu.opsu.GameMod;
+import itdelatrisu.opsu.Options;
 import itdelatrisu.opsu.OsuFile;
 import itdelatrisu.opsu.OsuHitObject;
 import itdelatrisu.opsu.Utils;
@@ -28,11 +30,14 @@ import itdelatrisu.opsu.objects.curves.CircumscribedCircle;
 import itdelatrisu.opsu.objects.curves.Curve;
 import itdelatrisu.opsu.objects.curves.LinearBezier;
 import itdelatrisu.opsu.states.Game;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
+import org.newdawn.slick.SlickException;
 
 /**
  * Data type representing a slider object.
@@ -94,6 +99,9 @@ public class Slider implements HitObject {
 
 	/** Container dimensions. */
 	private static int containerWidth, containerHeight;
+        
+        private Image imgCache;
+        private Graphics imgCacheGfx;
 
 	/**
 	 * Initializes the Slider data type with images and dimensions.
@@ -146,6 +154,9 @@ public class Slider implements HitObject {
 			this.curve = new CircumscribedCircle(hitObject, color);
 		else
 			this.curve = new LinearBezier(hitObject, color);
+                
+                imgCache = null;
+                imgCacheGfx = null;
 	}
 
 	@Override
@@ -155,12 +166,58 @@ public class Slider implements HitObject {
 		float approachScale = 1 + scale * 3;
 		float alpha = Utils.clamp(1 - scale, 0, 1);
 
-		float oldAlpha = color.a;
+                Image hitCircleOverlay = GameImage.HITCIRCLE_OVERLAY.getImage();
+                Image hitCircle = GameImage.HITCIRCLE.getImage();
+                float[] endPos = curve.pointAt(1);
+
+                float oldAlpha = color.a;
+
+                if (imgCache == null || imgCacheGfx == null) {
+                    try {
+                        SliderCache cache = SliderCache.getInstance();
+                        GraphicsImagePair mapping = cache.get(hitObject);
+                        if (mapping == null && !cache.isFull()) {
+                            mapping = cache.insert(hitObject);
+                        }
+                        if (mapping == null) {
+                            //cache is full, just do the inefficient thing
+                            imgCache = new Image(
+                                    Options.getLatestResolutionWidth(),
+                                    Options.getLatestResolutionHeight());
+                            imgCacheGfx = imgCache.getGraphics();
+                            imgCacheGfx.setBackground(new Color(0, 0, 0, 0));
+                        } else {
+                            imgCache = mapping.img;
+                            imgCacheGfx = mapping.gfx;
+                        }
+                        imgCacheGfx.clear();
+                        //FBOGraphics, PBufferGraphics, PBufferUniqueGraphics
+                        Graphics.setCurrent(imgCacheGfx);
+                        Utils.COLOR_WHITE_FADE.a = 1.0f;
+                        curve.draw(imgCacheGfx);
+                        color.a = 1f;
+
+                        // end circle
+                        hitCircle.drawCentered(endPos[0], endPos[1], color);
+                        hitCircleOverlay.drawCentered(endPos[0], endPos[1], Utils.COLOR_WHITE_FADE);
+
+                        // start circle
+                        hitCircle.drawCentered(x, y, color);
+                        hitCircleOverlay.drawCentered(x, y, Utils.COLOR_WHITE_FADE);
+                        imgCacheGfx.flush();
+                        Graphics.setCurrent(g);
+                    } catch (SlickException e) {
+                        ErrorHandler.error("Failed to allocate image for cache of slider", e, false);
+                    }
+                }
+
 		color.a = alpha;
 		Utils.COLOR_WHITE_FADE.a = alpha;
 
 		// curve
-		curve.draw();
+		//curve.draw();
+                imgCache.setAlpha(alpha);
+                imgCache.draw(0,0);
 
 		// ticks
 		if (timeDiff < 0 && ticksT != null) {
@@ -171,19 +228,6 @@ public class Slider implements HitObject {
 			}
 		}
 
-		Image hitCircleOverlay = GameImage.HITCIRCLE_OVERLAY.getImage();
-		Image hitCircle = GameImage.HITCIRCLE.getImage();
-		color.a = alpha;
-		Utils.COLOR_WHITE_FADE.a = 1f;
-
-		// end circle
-		float[] endPos = curve.pointAt(1);
-		hitCircle.drawCentered(endPos[0], endPos[1], color);
-		hitCircleOverlay.drawCentered(endPos[0], endPos[1], Utils.COLOR_WHITE_FADE);
-
-		// start circle
-		hitCircle.drawCentered(x, y, color);
-		hitCircleOverlay.drawCentered(x, y, Utils.COLOR_WHITE_FADE);
 		if (sliderClickedInitial)
 			;  // don't draw current combo number if already clicked
 		else
@@ -385,6 +429,11 @@ public class Slider implements HitObject {
 
 			// calculate and send slider result
 			hitResult();
+                        
+                        SliderCache cache = SliderCache.getInstance();
+                        cache.freeMappingFor(hitObject);
+                        imgCache = null;
+                        imgCacheGfx = null;
 			return true;
 		}
 
@@ -488,4 +537,93 @@ public class Slider implements HitObject {
 			return (floor % 2 == 0) ? t - floor : floor + 1 - t;
 		}
 	}
+
+
+static class GraphicsImagePair
+{
+    public Graphics gfx = null;
+    public Image img = null;
+}
+public static class SliderCache
+{
+    public final static int CACHE_SIZE = 10;
+    public static SliderCache instance = null;
+
+    Map<OsuHitObject,GraphicsImagePair> cacheMap;
+    GraphicsImagePair CACHE[];
+    public final int width, height;
+    
+    SliderCache(int width, int height) {
+        CACHE = new GraphicsImagePair[CACHE_SIZE];
+        cacheMap = new HashMap<OsuHitObject,GraphicsImagePair>();
+        this.width = width;
+        this.height = height;
+        
+        try {
+                //TODO: described here: http://slick.ninjacave.com/wiki/index.php?title=Rendering_to_an_Image
+                //as terribly slow, consider either doing it in a seperate thread or doing this whole class
+                //in a lower level fashion with LWJGL directly
+                for (int i = 0; i < CACHE.length; ++i) {
+                    CACHE[i] = new GraphicsImagePair();
+                    CACHE[i].img = new Image(width, height);
+                    Graphics gfx = CACHE[i].img.getGraphics();
+                    gfx.setBackground(new Color(0,0,0,0));
+                    gfx.scale(1.0f/width, 1.0f/height);
+                    CACHE[i].gfx = gfx;
+                }
+            } catch (SlickException e) {
+                ErrorHandler.error("Failed to allocate image in cache", e, false);
+            }
+    }
+    
+    public boolean isFull(){
+        return cacheMap.size() >= CACHE_SIZE;
+    }
+    
+    public boolean contains(OsuHitObject obj){
+        return cacheMap.containsKey(obj);
+    }
+    
+    public GraphicsImagePair get(OsuHitObject obj){
+        return cacheMap.get(obj);
+    }
+
+    public boolean freeMappingFor(OsuHitObject obj){
+        return cacheMap.remove(obj) == null;
+    }
+
+    public void freeMap(){
+        cacheMap.clear();
+    }
+
+
+    public GraphicsImagePair insert(OsuHitObject obj){
+        if(isFull())
+        {
+            throw new IllegalStateException("Tried to add to Full SliderCacheMap");
+        }else
+        {
+            //find first GraphicsImagePair that's not mapped to anything and return it
+            for(int i = 0; i< CACHE_SIZE; ++i)
+            {
+                if(!cacheMap.containsValue(CACHE[i]))
+                {
+                    cacheMap.put(obj, CACHE[i]);
+                    return CACHE[i];
+                }
+            }
+            throw new IllegalStateException("SliderCacheMap does not contain only unique GraphicsImagePair instances");
+        }
+    }
+    
+    public static SliderCache getInstance()
+    {
+        if (instance == null) {
+            instance = new SliderCache(
+                    Options.getLatestResolutionWidth(),
+                    Options.getLatestResolutionHeight());
+        }
+        return instance;
+    }
+}
 }
