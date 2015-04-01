@@ -20,8 +20,17 @@ package itdelatrisu.opsu.objects.curves;
 
 import itdelatrisu.opsu.ErrorHandler;
 import itdelatrisu.opsu.GameImage;
+import itdelatrisu.opsu.Options;
 import itdelatrisu.opsu.OsuHitObject;
 import itdelatrisu.opsu.Utils;
+import static itdelatrisu.opsu.objects.curves.Curve.program;
+import java.nio.FloatBuffer;
+import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL14;
+import org.lwjgl.opengl.GL15;
+import org.lwjgl.opengl.GL20;
+import org.lwjgl.opengl.GL30;
 
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
@@ -180,18 +189,79 @@ public class CircumscribedCircle extends Curve {
 	}
 
 	@Override
-	public void draw(Graphics g) {
-		Image hitCircle = GameImage.SLIDER_CORE.getImage();
-		Image hitCircleOverlay = GameImage.SLIDER_BORDER.getImage();
-               g.setDrawMode(Graphics.MODE_ADD);
-               Color old = g.getColor();
-               g.setColor(Color.white);
-		 for (int i = 0; i < step-2; ++i)
-                        hitCircleOverlay.drawCentered(curve[i].x, curve[i].y, Color.white);
-               g.setColor(old);
-		g.setDrawMode(Graphics.MODE_ALPHA_BLEND);
-		for (int i = 0; i < step-2 ; ++i)
-			hitCircle.drawCentered(curve[i].x, curve[i].y, color);
+	public void draw() {
+            if (Options.GameOption.NEW_SLIDER.getBooleanValue()) {
+                usedRenderState state = startRender();
+                ///////////////////////////////////////////////////
+                final boolean useShaders = true;
+                int vtx_buf;
+                FloatBuffer buff = BufferUtils.createByteBuffer(4 * (4+2) * (2 * curve.length -1)  * (DIVIDES+2) ).asFloatBuffer();
+                if (useShaders) {
+                    initShaderProgram();
+                    int texSizeLoc = GL20.glGetUniformLocation(program, "tex_size");
+                    int texLoc = GL20.glGetUniformLocation(program, "tex");
+                    colLoc = GL20.glGetUniformLocation(program, "col_tint");
+                    GL20.glUseProgram(program);
+                    GL20.glUniform1i(texLoc, 0);
+                    GL20.glUniform2f(texSizeLoc, 32f, 32f);
+                
+                    vtx_buf = GL15.glGenBuffers();
+                }
+                //////////////////////////////////////////////////
+                for (int i = 0; i < curve.length; ++i) {
+                    float x = curve[i].x;
+                    float y = curve[i].y;
+                    //if(i == 0 || i==curve.length-1){
+                    if (useShaders) {
+                        fillCone(buff, x, y, DIVIDES);
+                    } else {
+                        drawCone(x, y, DIVIDES);
+                    }
+                    if (i != 0) {
+                        float last_x = curve[i - 1].x;
+                        float last_y = curve[i - 1].y;
+                        double diff_x = x - last_x;
+                        double diff_y = y - last_y;
+                        x = (float) (x - diff_x / 2);
+                        y = (float) (y - diff_y / 2);
+                        if (useShaders) {
+                            fillCone(buff, x, y, DIVIDES);
+                        } else {
+                            drawCone(x, y, DIVIDES);
+                        }
+                    }
+                }
+                if(useShaders)
+                {
+                    GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vtx_buf);
+                    buff.flip();
+                    GL15.glBufferData(GL15.GL_ARRAY_BUFFER, buff, GL15.GL_STATIC_DRAW);
+                    GL20.glEnableVertexAttribArray(attribLoc);
+                    GL20.glEnableVertexAttribArray(texCoordLoc);
+                    GL20.glVertexAttribPointer(attribLoc, 4, GL11.GL_FLOAT,false,6*4,2*4);
+                    GL20.glVertexAttribPointer(texCoordLoc, 2, GL11.GL_FLOAT, false, 6*4,0);
+                 
+                    GL20.glUniform3f(colLoc, color.r, color.g, color.b);
+                    for (int i = 0; i < curve.length*2-1; ++i) {
+                        GL11.glDrawArrays(GL11.GL_TRIANGLE_FAN,i*(DIVIDES+2),DIVIDES+2);
+                    }
+                    
+                    GL20.glDisableVertexAttribArray(texCoordLoc);
+                    GL20.glDisableVertexAttribArray(attribLoc);
+                    GL15.glDeleteBuffers(vtx_buf);
+                }
+                endRender(state);
+            } else {
+                Image hitCircle = GameImage.HITCIRCLE.getImage();
+                Image hitCircleOverlay = GameImage.HITCIRCLE_OVERLAY.getImage();
+                for (int i = 0; i < step; i++) {
+                    hitCircleOverlay.drawCentered(curve[i].x, curve[i].y, Utils.COLOR_WHITE_FADE);
+                }
+                for (int i = 0; i < step; i++) {
+                    hitCircle.drawCentered(curve[i].x, curve[i].y, color);
+                }
+
+            }
 	}
 
 	@Override

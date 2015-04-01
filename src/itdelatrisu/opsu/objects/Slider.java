@@ -18,7 +18,6 @@
 
 package itdelatrisu.opsu.objects;
 
-import itdelatrisu.opsu.ErrorHandler;
 import itdelatrisu.opsu.GameData;
 import itdelatrisu.opsu.GameImage;
 import itdelatrisu.opsu.GameMod;
@@ -29,15 +28,19 @@ import itdelatrisu.opsu.Utils;
 import itdelatrisu.opsu.objects.curves.CircumscribedCircle;
 import itdelatrisu.opsu.objects.curves.Curve;
 import itdelatrisu.opsu.objects.curves.LinearBezier;
+import itdelatrisu.opsu.render.Rendertarget;
 import itdelatrisu.opsu.states.Game;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL30;
 
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
-import org.newdawn.slick.SlickException;
+import org.newdawn.slick.util.Log;
 
 /**
  * Data type representing a slider object.
@@ -46,11 +49,14 @@ public class Slider implements HitObject {
 	/** Slider ball frames. */
 	private static Image[] sliderBallImages;
 
-	/** Slider movement speed multiplier. */
+        /** Slider movement speed multiplier. */
 	private static float sliderMultiplier = 1.0f;
 
 	/** Rate at which slider ticks are placed. */
 	private static float sliderTickRate = 1.0f;
+        
+        /** Scaling factor for display elements */
+        private static int diameter = 1;
 
 	/** The associated OsuHitObject. */
 	private OsuHitObject hitObject;
@@ -100,9 +106,9 @@ public class Slider implements HitObject {
 	/** Container dimensions. */
 	private static int containerWidth, containerHeight;
         
-        private Image imgCache;
-        private Graphics imgCacheGfx;
-
+        /** cached drawn slider, only used if new style sliders are activated */
+        private Rendertarget fbo;
+                
 	/**
 	 * Initializes the Slider data type with images and dimensions.
 	 * @param container the game container
@@ -113,7 +119,7 @@ public class Slider implements HitObject {
 		containerWidth = container.getWidth();
 		containerHeight = container.getHeight();
 
-		int diameter = (int) (104 - (circleSize * 8));
+		diameter = (int) (104 - (circleSize * 8));
 		diameter = (int) (diameter * OsuHitObject.getXMultiplier());  // convert from Osupixels (640x480)
 
 		// slider ball
@@ -155,46 +161,47 @@ public class Slider implements HitObject {
 		else
 			this.curve = new LinearBezier(hitObject, color);
                 
-                imgCache = null;
-                imgCacheGfx = null;
+                this.curve.setScale(diameter * 118 / 128);
+                
+                fbo = null;
 	}
 
 	@Override
 	public void draw(Graphics g, int trackPosition) {
+            
 		int timeDiff = hitObject.getTime() - trackPosition;
 		float scale = timeDiff / (float) game.getApproachTime();
 		float approachScale = 1 + scale * 3;
 		float alpha = Utils.clamp(1 - scale, 0, 1);
 
+                float oldAlpha = color.a;
+                
                 Image hitCircleOverlay = GameImage.HITCIRCLE_OVERLAY.getImage();
                 Image hitCircle = GameImage.HITCIRCLE.getImage();
                 float[] endPos = curve.pointAt(1);
-
-                float oldAlpha = color.a;
-
-                if (imgCache == null || imgCacheGfx == null) {
-                    try {
+                
+                if (Options.GameOption.NEW_SLIDER.getBooleanValue()) {
+                    if (fbo == null) {
                         SliderCache cache = SliderCache.getInstance();
-                        GraphicsImagePair mapping = cache.get(hitObject);
-                        if (mapping == null && !cache.isFull()) {
+                        Rendertarget mapping = cache.get(hitObject);
+                        if (mapping == null) {
                             mapping = cache.insert(hitObject);
                         }
                         if (mapping == null) {
-                            //cache is full, just do the inefficient thing
-                            imgCache = new Image(
-                                    Options.getLatestResolutionWidth(),
-                                    Options.getLatestResolutionHeight());
-                            imgCacheGfx = imgCache.getGraphics();
-                            imgCacheGfx.setBackground(new Color(0, 0, 0, 0));
+                            //create fbo
                         } else {
-                            imgCache = mapping.img;
-                            imgCacheGfx = mapping.gfx;
+                            fbo = mapping;
                         }
-                        imgCacheGfx.clear();
-                        //FBOGraphics, PBufferGraphics, PBufferUniqueGraphics
-                        Graphics.setCurrent(imgCacheGfx);
+
+                        int old_fb = GL11.glGetInteger(GL30.GL_FRAMEBUFFER_BINDING);
+                        int old_tex = GL11.glGetInteger(GL11.GL_TEXTURE_BINDING_2D);
+
+                        GL30.glBindFramebuffer(GL30.GL_DRAW_FRAMEBUFFER, fbo.getID());
+                        GL11.glViewport(0, 0, fbo.width, fbo.height);
+                        GL11.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+                        GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
                         Utils.COLOR_WHITE_FADE.a = 1.0f;
-                        curve.draw(imgCacheGfx);
+                        curve.draw();
                         color.a = 1f;
 
                         // end circle
@@ -204,22 +211,44 @@ public class Slider implements HitObject {
                         // start circle
                         hitCircle.drawCentered(x, y, color);
                         hitCircleOverlay.drawCentered(x, y, Utils.COLOR_WHITE_FADE);
-                        imgCacheGfx.flush();
-                        Graphics.setCurrent(g);
-                    } catch (SlickException e) {
-                        ErrorHandler.error("Failed to allocate image for cache of slider", e, false);
+                        GL11.glFlush();
+
+                        GL11.glBindTexture(GL11.GL_TEXTURE_2D, old_tex);
+                        GL30.glBindFramebuffer(GL30.GL_DRAW_FRAMEBUFFER, old_fb);
                     }
+
+                    color.a = alpha;
+                    Utils.COLOR_WHITE_FADE.a = alpha;
+
+                    GL11.glBindTexture(GL11.GL_TEXTURE_2D, fbo.getTextureID());
+                    GL11.glBegin(GL11.GL_QUADS);
+                    GL11.glColor4f(1.0f, 1.0f, 1.0f, alpha);
+                    GL11.glTexCoord2f(1.0f, 1.0f);
+                    GL11.glVertex2i(fbo.width, 0);
+                    GL11.glTexCoord2f(0.0f, 1.0f);
+                    GL11.glVertex2i(0, 0);
+                    GL11.glTexCoord2f(0.0f, 0.0f);
+                    GL11.glVertex2i(0, fbo.height);
+                    GL11.glTexCoord2f(1.0f, 0.0f);
+                    GL11.glVertex2i(fbo.width, fbo.height);
+                    GL11.glEnd();
+                } else {
+                    color.a = alpha;
+                    Utils.COLOR_WHITE_FADE.a = alpha;
+                    curve.draw();
+                    color.a = alpha;
+                    Utils.COLOR_WHITE_FADE.a = 1f;
+
+                    // end circle
+                    hitCircle.drawCentered(endPos[0], endPos[1], color);
+                    hitCircleOverlay.drawCentered(endPos[0], endPos[1], Utils.COLOR_WHITE_FADE);
+
+                    // start circle
+                    hitCircle.drawCentered(x, y, color);
+                    hitCircleOverlay.drawCentered(x, y, Utils.COLOR_WHITE_FADE);
+
                 }
-
-		color.a = alpha;
-		Utils.COLOR_WHITE_FADE.a = alpha;
-
-		// curve
-		//curve.draw();
-                imgCache.setAlpha(alpha);
-                imgCache.draw(0,0);
-
-		// ticks
+                // ticks
 		if (timeDiff < 0 && ticksT != null) {
 			Image tick = GameImage.SLIDER_TICK.getImage();
 			for (int i = 0; i < ticksT.length; i++) {
@@ -227,7 +256,6 @@ public class Slider implements HitObject {
 				tick.drawCentered(c[0], c[1]);
 			}
 		}
-
 		if (sliderClickedInitial)
 			;  // don't draw current combo number if already clicked
 		else
@@ -430,10 +458,11 @@ public class Slider implements HitObject {
 			// calculate and send slider result
 			hitResult();
                         
+                        //free the fbo to be re-used by another slider
                         SliderCache cache = SliderCache.getInstance();
                         cache.freeMappingFor(hitObject);
-                        imgCache = null;
-                        imgCacheGfx = null;
+                        fbo = null;
+                        
 			return true;
 		}
 
@@ -539,52 +568,35 @@ public class Slider implements HitObject {
 	}
 
 
-static class GraphicsImagePair
-{
-    public Graphics gfx = null;
-    public Image img = null;
-}
 public static class SliderCache
 {
-    public final static int CACHE_SIZE = 10;
+    public final static int CACHE_SIZE = 4;
     public static SliderCache instance = null;
 
-    Map<OsuHitObject,GraphicsImagePair> cacheMap;
-    GraphicsImagePair CACHE[];
+    Map<OsuHitObject,Rendertarget> cacheMap;
+    ArrayList<Rendertarget> cache;
     public final int width, height;
     
     SliderCache(int width, int height) {
-        CACHE = new GraphicsImagePair[CACHE_SIZE];
-        cacheMap = new HashMap<OsuHitObject,GraphicsImagePair>();
+        cache = new ArrayList<>(CACHE_SIZE);
+        cacheMap = new HashMap<>();
         this.width = width;
         this.height = height;
-        
-        try {
-                //TODO: described here: http://slick.ninjacave.com/wiki/index.php?title=Rendering_to_an_Image
-                //as terribly slow, consider either doing it in a seperate thread or doing this whole class
-                //in a lower level fashion with LWJGL directly
-                for (int i = 0; i < CACHE.length; ++i) {
-                    CACHE[i] = new GraphicsImagePair();
-                    CACHE[i].img = new Image(width, height);
-                    Graphics gfx = CACHE[i].img.getGraphics();
-                    gfx.setBackground(new Color(0,0,0,0));
-                    gfx.scale(1.0f/width, 1.0f/height);
-                    CACHE[i].gfx = gfx;
-                }
-            } catch (SlickException e) {
-                ErrorHandler.error("Failed to allocate image in cache", e, false);
-            }
-    }
-    
-    public boolean isFull(){
-        return cacheMap.size() >= CACHE_SIZE;
+
+        int old_framebuffer = GL11.glGetInteger(GL30.GL_READ_FRAMEBUFFER_BINDING);
+        int old_texture = GL11.glGetInteger(GL11.GL_TEXTURE_BINDING_2D);
+        for (int i = 0; i < CACHE_SIZE; ++i) {
+            cache.add(Rendertarget.createRTTFramebuffer(width,height));
+        }
+        GL11.glBindTexture(GL11.GL_TEXTURE_2D, old_texture);
+        GL30.glBindFramebuffer(GL30.GL_DRAW_FRAMEBUFFER, old_framebuffer);
     }
     
     public boolean contains(OsuHitObject obj){
         return cacheMap.containsKey(obj);
     }
     
-    public GraphicsImagePair get(OsuHitObject obj){
+    public Rendertarget get(OsuHitObject obj){
         return cacheMap.get(obj);
     }
 
@@ -596,24 +608,22 @@ public static class SliderCache
         cacheMap.clear();
     }
 
-
-    public GraphicsImagePair insert(OsuHitObject obj){
-        if(isFull())
-        {
-            throw new IllegalStateException("Tried to add to Full SliderCacheMap");
-        }else
-        {
-            //find first GraphicsImagePair that's not mapped to anything and return it
-            for(int i = 0; i< CACHE_SIZE; ++i)
-            {
-                if(!cacheMap.containsValue(CACHE[i]))
-                {
-                    cacheMap.put(obj, CACHE[i]);
-                    return CACHE[i];
-                }
+    public Rendertarget insert(OsuHitObject obj){
+        //find first RTTFramebuffer that's not mapped to anything and return it
+        Rendertarget buffer;
+        for (int i = 0; i < CACHE_SIZE; ++i) {
+            buffer = cache.get(i);
+            if (!cacheMap.containsValue(buffer)) {
+                cacheMap.put(obj, buffer);
+                return buffer;
             }
-            throw new IllegalStateException("SliderCacheMap does not contain only unique GraphicsImagePair instances");
         }
+        //no unmapped RTTFramebuffer found, create a new one
+        buffer = Rendertarget.createRTTFramebuffer(width,height);
+        cache.add(buffer);
+        Log.warn("Framebuffer cache was not large enough, possible resource leak.");
+        cacheMap.put(obj, buffer);
+        return buffer;
     }
     
     public static SliderCache getInstance()
@@ -625,5 +635,5 @@ public static class SliderCache
         }
         return instance;
     }
-}
+    }
 }
