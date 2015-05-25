@@ -20,6 +20,7 @@ package itdelatrisu.opsu.skins;
 
 import itdelatrisu.opsu.ErrorHandler;
 import itdelatrisu.opsu.Utils;
+import itdelatrisu.opsu.Log;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -30,7 +31,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 
 import org.newdawn.slick.Color;
-import org.newdawn.slick.util.Log;
 
 /**
  * Loads skin configuration files.

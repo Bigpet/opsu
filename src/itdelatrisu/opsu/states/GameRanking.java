@@ -30,6 +30,7 @@ import itdelatrisu.opsu.beatmap.Beatmap;
 import itdelatrisu.opsu.replay.Replay;
 import itdelatrisu.opsu.ui.MenuButton;
 import itdelatrisu.opsu.ui.UI;
+import itdelatrisu.opsu.Log;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -45,7 +46,7 @@ import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
 import org.newdawn.slick.state.transition.FadeInTransition;
 import org.newdawn.slick.state.transition.FadeOutTransition;
-import org.newdawn.slick.util.Log;
+
 
 /**
  * "Game Ranking" (score card) state.

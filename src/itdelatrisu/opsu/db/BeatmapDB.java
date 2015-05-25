@@ -19,6 +19,7 @@
 package itdelatrisu.opsu.db;
 
 import itdelatrisu.opsu.ErrorHandler;
+import itdelatrisu.opsu.Log;
 import itdelatrisu.opsu.Options;
 import itdelatrisu.opsu.beatmap.Beatmap;
 import itdelatrisu.opsu.beatmap.BeatmapParser;
@@ -32,8 +33,6 @@ import java.sql.Statement;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.newdawn.slick.util.Log;
 
 /**
  * Handles connections and queries with the cached beatmap database.

@@ -31,7 +31,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.UIManager;
 
-import org.newdawn.slick.util.Log;
 import org.newdawn.slick.util.ResourceLoader;
 
 /**

@@ -18,6 +18,7 @@
 
 package itdelatrisu.opsu.beatmap;
 
+import itdelatrisu.opsu.Log;
 import itdelatrisu.opsu.Options;
 
 import java.io.File;
@@ -28,7 +29,6 @@ import java.util.LinkedList;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
-import org.newdawn.slick.util.Log;
 
 /**
  * Beatmap structure storing data parsed from OSU files.

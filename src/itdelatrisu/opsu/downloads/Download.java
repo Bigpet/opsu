@@ -19,6 +19,7 @@
 package itdelatrisu.opsu.downloads;
 
 import itdelatrisu.opsu.ErrorHandler;
+import itdelatrisu.opsu.Log;
 import itdelatrisu.opsu.Utils;
 
 import java.io.File;
@@ -33,8 +34,6 @@ import java.nio.channels.ReadableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-
-import org.newdawn.slick.util.Log;
 
 /**
  * File download.

@@ -19,7 +19,6 @@
 package itdelatrisu.opsu;
 
 import itdelatrisu.opsu.audio.MusicController;
-import itdelatrisu.opsu.db.DBController;
 import itdelatrisu.opsu.downloads.DownloadList;
 import itdelatrisu.opsu.downloads.Updater;
 import itdelatrisu.opsu.states.ButtonMenu;
@@ -33,23 +32,12 @@ import itdelatrisu.opsu.states.SongMenu;
 import itdelatrisu.opsu.states.Splash;
 import itdelatrisu.opsu.ui.UI;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.net.ServerSocket;
-
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.state.StateBasedGame;
 import org.newdawn.slick.state.transition.FadeInTransition;
 import org.newdawn.slick.state.transition.FadeOutTransition;
-import org.newdawn.slick.util.DefaultLogSystem;
-import org.newdawn.slick.util.FileSystemLocation;
-import org.newdawn.slick.util.Log;
-import org.newdawn.slick.util.ResourceLoader;
 
 /**
  * Main class.
@@ -68,9 +56,6 @@ public class Opsu extends StateBasedGame {
 		STATE_GAMERANKING   = 6,
 		STATE_OPTIONSMENU   = 7,
 		STATE_DOWNLOADSMENU = 8;
-
-	/** Server socket for restricting the program to a single instance. */
-	private static ServerSocket SERVER_SOCKET;
 
 	/**
 	 * Constructor.
@@ -94,90 +79,11 @@ public class Opsu extends StateBasedGame {
 	}
 
 	/**
+         * @TODO: Remove this method. the one in OpsuStartup should be all that's necessary
 	 * Launches opsu!.
 	 */
 	public static void main(String[] args) {
-		// log all errors to a file
-		Log.setVerbose(false);
-		try {
-			DefaultLogSystem.out = new PrintStream(new FileOutputStream(Options.LOG_FILE, true));
-		} catch (FileNotFoundException e) {
-			Log.error(e);
-		}
-		Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
-			@Override
-			public void uncaughtException(Thread t, Throwable e) {
-				ErrorHandler.error("** Uncaught Exception! **", e, true);
-			}
-		});
-
-		// parse configuration file
-		Options.parseOptions();
-
-		// only allow a single instance
-		try {
-			SERVER_SOCKET = new ServerSocket(Options.getPort());
-		} catch (IOException e) {
-			ErrorHandler.error(String.format("Another program is already running on port %d.", Options.getPort()), e, false);
-			System.exit(1);
-		}
-
-		// set path for lwjgl natives - NOT NEEDED if using JarSplice
-		File nativeDir = new File("./target/natives/");
-		if (nativeDir.isDirectory())
-			System.setProperty("org.lwjgl.librarypath", nativeDir.getAbsolutePath());
-
-		// set the resource paths
-		ResourceLoader.addResourceLocation(new FileSystemLocation(new File("./res/")));
-
-		// initialize databases
-		try {
-			DBController.init();
-		} catch (UnsatisfiedLinkError e) {
-			errorAndExit(e, "The databases could not be initialized.");
-		}
-
-		// check if just updated
-		if (args.length >= 2)
-			Updater.get().setUpdateInfo(args[0], args[1]);
-
-		// check for updates
-		new Thread() {
-			@Override
-			public void run() {
-				try {
-					Updater.get().checkForUpdates();
-				} catch (IOException e) {
-					Log.warn("Check for updates failed.", e);
-				}
-			}
-		}.start();
-
-		// start the game
-		try {
-			// loop until force exit
-			while (true) {
-				Opsu opsu = new Opsu("opsu!");
-				Container app = new Container(opsu);
-
-				// basic game settings
-				Options.setDisplayMode(app);
-				String[] icons = { "icon16.png", "icon32.png" };
-				app.setIcons(icons);
-				app.setForceExit(true);
-
-				app.start();
-
-				// run update if available
-				if (Updater.get().getStatus() == Updater.Status.UPDATE_FINAL) {
-					close();
-					Updater.get().runUpdate();
-					break;
-				}
-			}
-		} catch (SlickException e) {
-			errorAndExit(e, "An error occurred while creating the game container.");
-		}
+		OpsuStartup.main(args);
 	}
 
 	@Override
@@ -223,35 +129,6 @@ public class Opsu extends StateBasedGame {
 	 * Closes all resources.
 	 */
 	public static void close() {
-		// close databases
-		DBController.closeConnections();
-
-		// cancel all downloads
-		DownloadList.get().cancelAllDownloads();
-
-		// close server socket
-		if (SERVER_SOCKET != null) {
-			try {
-				SERVER_SOCKET.close();
-			} catch (IOException e) {
-				ErrorHandler.error("Failed to close server socket.", e, false);
-			}
-		}
-	}
-
-	/**
-	 * Throws an error and exits the application with the given message.
-	 * @param e the exception that caused the crash
-	 * @param message the message to display
-	 */
-	private static void errorAndExit(Throwable e, String message) {
-		// JARs will not run properly inside directories containing '!'
-		// http://bugs.java.com/view_bug.do?bug_id=4523159
-		if (Utils.isJarRunning() && Utils.getRunningDirectory() != null &&
-		    Utils.getRunningDirectory().getAbsolutePath().indexOf('!') != -1)
-			ErrorHandler.error("JARs cannot be run from some paths containing '!'. Please move or rename the file and try again.", null, false);
-		else
-			ErrorHandler.error(message, e, true);
-		System.exit(1);
+		OpsuStartup.close();
 	}
 }

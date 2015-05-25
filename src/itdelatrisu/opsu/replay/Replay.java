@@ -19,6 +19,7 @@
 package itdelatrisu.opsu.replay;
 
 import itdelatrisu.opsu.ErrorHandler;
+import itdelatrisu.opsu.Log;
 import itdelatrisu.opsu.Options;
 import itdelatrisu.opsu.Utils;
 import itdelatrisu.opsu.io.OsuReader;
@@ -40,7 +41,6 @@ import java.util.List;
 import lzma.streams.LzmaOutputStream;
 
 import org.apache.commons.compress.compressors.lzma.LZMACompressorInputStream;
-import org.newdawn.slick.util.Log;
 
 /**
  * Captures osu! replay data.

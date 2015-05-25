@@ -38,7 +38,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.newdawn.slick.Color;
-import org.newdawn.slick.util.Log;
 
 /**
  * Parser for beatmaps.

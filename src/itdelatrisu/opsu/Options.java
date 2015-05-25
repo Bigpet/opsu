@@ -43,7 +43,6 @@ import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.util.ClasspathLocation;
 import org.newdawn.slick.util.FileSystemLocation;
-import org.newdawn.slick.util.Log;
 import org.newdawn.slick.util.ResourceLoader;
 
 /**

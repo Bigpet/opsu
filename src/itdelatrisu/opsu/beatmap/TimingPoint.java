@@ -18,9 +18,8 @@
 
 package itdelatrisu.opsu.beatmap;
 
+import itdelatrisu.opsu.Log;
 import itdelatrisu.opsu.Utils;
-
-import org.newdawn.slick.util.Log;
 
 /**
  * Data type representing a timing point.
