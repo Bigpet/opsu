@@ -18,15 +18,11 @@
 package itdelatrisu.opsu;
 
 /**
- * Simple log system interface copied from Slick2D
+ *
  * @author Bigpet {@literal <dravorek@gmail.com>}
  */
-public interface LogSystem {
-    public void debug(String message);
-    public void error(String message);
-    public void error(String message, Throwable e);
-    public void error(Throwable e);
-    public void info(String message);
-    public void warn(String message);
-    public void warn(String message, Throwable e);        
+public interface DisplayDevice {
+    public int getMaxWidth();
+    public int getMaxHeight();
+    public void setDisplayResolution(int width, int height);
 }

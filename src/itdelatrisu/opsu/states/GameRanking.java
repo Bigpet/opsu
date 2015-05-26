@@ -30,7 +30,7 @@ import itdelatrisu.opsu.beatmap.Beatmap;
 import itdelatrisu.opsu.replay.Replay;
 import itdelatrisu.opsu.ui.MenuButton;
 import itdelatrisu.opsu.ui.UI;
-import itdelatrisu.opsu.Log;
+import itdelatrisu.opsu.log.Log;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -148,15 +148,6 @@ public class GameRanking extends BasicGameState {
 		switch (key) {
 		case Input.KEY_ESCAPE:
 			returnToSongMenu();
-			break;
-		case Input.KEY_F7:
-			Options.setNextFPS(container);
-			break;
-		case Input.KEY_F10:
-			Options.toggleMouseDisabled();
-			break;
-		case Input.KEY_F12:
-			Utils.takeScreenShot();
 			break;
 		}
 	}

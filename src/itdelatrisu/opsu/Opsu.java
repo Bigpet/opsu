@@ -34,6 +34,7 @@ import itdelatrisu.opsu.ui.UI;
 
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
+import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.state.StateBasedGame;
 import org.newdawn.slick.state.transition.FadeInTransition;
@@ -45,7 +46,10 @@ import org.newdawn.slick.state.transition.FadeOutTransition;
  * Creates game container, adds all other states, and initializes song data.
  */
 public class Opsu extends StateBasedGame {
-	/** Game states. */
+        //@TODO: remove this
+	private Container initedContainer;
+    
+        /** Game states. */
 	public static final int
 		STATE_SPLASH        = 0,
 		STATE_MAINMENU      = 1,
@@ -76,6 +80,8 @@ public class Opsu extends StateBasedGame {
 		addState(new GameRanking(STATE_GAMERANKING));
 		addState(new OptionsMenu(STATE_OPTIONSMENU));
 		addState(new DownloadsMenu(STATE_DOWNLOADSMENU));
+                //@TODO: remove this
+                initedContainer = (Container) container;
 	}
 
 	/**
@@ -131,4 +137,23 @@ public class Opsu extends StateBasedGame {
 	public static void close() {
 		OpsuStartup.close();
 	}
+        
+        @Override
+        public void keyPressed(int key, char c)
+        {
+            switch(key)
+            {
+                case Input.KEY_F7:
+			Options.setNextFPS(initedContainer);
+			break;
+		case Input.KEY_F10:
+			Options.toggleMouseDisabled();
+			break;
+		case Input.KEY_F12:
+			Utils.takeScreenShot();
+			break;
+            }
+            
+            super.keyPressed(key, c);
+        }
 }

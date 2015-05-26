@@ -18,7 +18,7 @@
 
 package itdelatrisu.opsu.beatmap;
 
-import itdelatrisu.opsu.Log;
+import itdelatrisu.opsu.log.Log;
 import itdelatrisu.opsu.Options;
 
 import java.io.File;

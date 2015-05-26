@@ -38,7 +38,7 @@ import itdelatrisu.opsu.downloads.servers.HexideServer;
 import itdelatrisu.opsu.downloads.servers.OsuMirrorServer;
 import itdelatrisu.opsu.ui.MenuButton;
 import itdelatrisu.opsu.ui.UI;
-import itdelatrisu.opsu.Log;
+import itdelatrisu.opsu.log.Log;
 
 import java.io.File;
 import java.io.IOException;
@@ -773,15 +773,6 @@ public class DownloadsMenu extends BasicGameState {
 			lastQuery = null;
 			pageDir = Page.CURRENT;
 			resetSearchTimer();
-			break;
-		case Input.KEY_F7:
-			Options.setNextFPS(container);
-			break;
-		case Input.KEY_F10:
-			Options.toggleMouseDisabled();
-			break;
-		case Input.KEY_F12:
-			Utils.takeScreenShot();
 			break;
 		default:
 			// wait for user to finish typing

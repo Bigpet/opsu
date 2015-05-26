@@ -18,6 +18,7 @@
 
 package itdelatrisu.opsu;
 
+import itdelatrisu.opsu.log.Log;
 import java.awt.Cursor;
 import java.awt.Desktop;
 import java.io.PrintWriter;

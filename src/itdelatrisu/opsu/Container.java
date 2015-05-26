@@ -24,6 +24,7 @@ import itdelatrisu.opsu.beatmap.BeatmapSetList;
 import itdelatrisu.opsu.downloads.DownloadList;
 import itdelatrisu.opsu.downloads.Updater;
 import itdelatrisu.opsu.ui.UI;
+import itdelatrisu.opsu.log.Log;
 
 import org.lwjgl.opengl.Display;
 import org.newdawn.slick.AppGameContainer;
@@ -34,7 +35,7 @@ import org.newdawn.slick.opengl.InternalTextureLoader;
 /**
  * AppGameContainer extension that sends critical errors to ErrorHandler.
  */
-public class Container extends AppGameContainer {
+public class Container extends AppGameContainer implements OpsuClient{
 	/** SlickException causing game failure. */
 	protected SlickException e = null;
 
@@ -148,4 +149,39 @@ public class Container extends AppGameContainer {
 
 		super.exit();
 	}
+
+    @Override
+    public int getMaxWidth() {
+        return getScreenWidth();
+    }
+
+    @Override
+    public int getMaxHeight() {
+        return getScreenHeight();
+    }
+
+    @Override
+    public void setDisplayResolution(int width, int height) {
+        try
+        {
+            setDisplayMode(width, height, false);
+        }
+        catch(SlickException e)
+        {
+            throw new RuntimeException(e.getMessage(),e.getCause());
+        }
+    }
+
+    @Override
+    public void setPreferNonEnglish(boolean preferNonEnglish) {
+        if (preferNonEnglish) {
+            try {
+                Utils.FONT_LARGE.loadGlyphs();
+                Utils.FONT_MEDIUM.loadGlyphs();
+                Utils.FONT_DEFAULT.loadGlyphs();
+            } catch (SlickException e) {
+                Log.warn("Failed to load glyphs.", e);
+            }
+        }
+    }
 }

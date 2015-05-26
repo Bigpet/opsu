@@ -19,7 +19,7 @@
 package itdelatrisu.opsu.downloads;
 
 import itdelatrisu.opsu.ErrorHandler;
-import itdelatrisu.opsu.Log;
+import itdelatrisu.opsu.log.Log;
 import itdelatrisu.opsu.Utils;
 
 import java.io.File;

@@ -20,7 +20,7 @@ package itdelatrisu.opsu.skins;
 
 import itdelatrisu.opsu.ErrorHandler;
 import itdelatrisu.opsu.Utils;
-import itdelatrisu.opsu.Log;
+import itdelatrisu.opsu.log.Log;
 
 import java.io.BufferedReader;
 import java.io.File;

@@ -18,6 +18,7 @@
 
 package itdelatrisu.opsu.states;
 
+import itdelatrisu.opsu.Container;
 import itdelatrisu.opsu.GameImage;
 import itdelatrisu.opsu.Opsu;
 import itdelatrisu.opsu.Options;
@@ -307,7 +308,8 @@ public class OptionsMenu extends BasicGameState {
 		// options (click only)
 		GameOption option = getOptionAt(y);
 		if (option != GameOption.NULL)
-			option.click(container);
+                        //@TODO: remove downcast
+			option.click((Container)container);
 
 		// special key entry states
 		if (option == GameOption.KEY_LEFT) {
@@ -343,7 +345,8 @@ public class OptionsMenu extends BasicGameState {
 		// options (drag only)
 		GameOption option = getOptionAt(oldy);
 		if (option != GameOption.NULL)
-			option.drag(container, diff);
+                        //@TODO: remove downcast
+			option.drag((Container)container, diff);
 	}
 
 	@Override
@@ -376,15 +379,6 @@ public class OptionsMenu extends BasicGameState {
 				container.setForceExit(false);
 				container.exit();
 			}
-			break;
-		case Input.KEY_F7:
-			Options.setNextFPS(container);
-			break;
-		case Input.KEY_F10:
-			Options.toggleMouseDisabled();
-			break;
-		case Input.KEY_F12:
-			Utils.takeScreenShot();
 			break;
 		case Input.KEY_TAB:
 			// change tabs

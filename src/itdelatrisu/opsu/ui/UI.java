@@ -18,6 +18,7 @@
 
 package itdelatrisu.opsu.ui;
 
+import itdelatrisu.opsu.Container;
 import itdelatrisu.opsu.ErrorHandler;
 import itdelatrisu.opsu.GameImage;
 import itdelatrisu.opsu.Options;
@@ -31,7 +32,6 @@ import javax.swing.UIManager;
 
 import org.newdawn.slick.Animation;
 import org.newdawn.slick.Color;
-import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.Input;
@@ -76,7 +76,7 @@ public class UI {
 	private static final int TOOLTIP_FADE_TIME = 200;
 
 	// game-related variables
-	private static GameContainer container;
+	private static Container container;
 	private static Input input;
 
 	// This class should not be instantiated.
@@ -88,7 +88,7 @@ public class UI {
 	 * @param game the game object
 	 * @throws SlickException
 	 */
-	public static void init(GameContainer container, StateBasedGame game)
+	public static void init(Container container, StateBasedGame game)
 			throws SlickException {
 		UI.container = container;
 		UI.input = container.getInput();

@@ -656,15 +656,6 @@ public class ButtonMenu extends BasicGameState {
 			if (menuState != null)
 				menuState.leave(container, game);
 			break;
-		case Input.KEY_F7:
-			Options.setNextFPS(container);
-			break;
-		case Input.KEY_F10:
-			Options.toggleMouseDisabled();
-			break;
-		case Input.KEY_F12:
-			Utils.takeScreenShot();
-			break;
 		default:
 			if (menuState != null)
 				menuState.keyPress(container, game, key, c);

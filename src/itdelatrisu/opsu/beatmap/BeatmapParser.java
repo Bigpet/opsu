@@ -21,6 +21,7 @@ package itdelatrisu.opsu.beatmap;
 import itdelatrisu.opsu.ErrorHandler;
 import itdelatrisu.opsu.Options;
 import itdelatrisu.opsu.Utils;
+import itdelatrisu.opsu.log.Log;
 import itdelatrisu.opsu.db.BeatmapDB;
 
 import java.io.BufferedReader;

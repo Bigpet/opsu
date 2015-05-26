@@ -18,6 +18,8 @@
 
 package itdelatrisu.opsu;
 
+import itdelatrisu.opsu.log.Log;
+import itdelatrisu.opsu.log.DefaultLogSystem;
 import static itdelatrisu.opsu.Opsu.close;
 import itdelatrisu.opsu.db.DBController;
 import itdelatrisu.opsu.downloads.DownloadList;

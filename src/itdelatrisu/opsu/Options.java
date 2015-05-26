@@ -18,6 +18,7 @@
 
 package itdelatrisu.opsu;
 
+import itdelatrisu.opsu.log.Log;
 import itdelatrisu.opsu.audio.MusicController;
 import itdelatrisu.opsu.beatmap.Beatmap;
 import itdelatrisu.opsu.skins.Skin;
@@ -38,9 +39,7 @@ import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 import org.lwjgl.input.Keyboard;
-import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Input;
-import org.newdawn.slick.SlickException;
 import org.newdawn.slick.util.ClasspathLocation;
 import org.newdawn.slick.util.FileSystemLocation;
 import org.newdawn.slick.util.ResourceLoader;
@@ -156,12 +155,12 @@ public class Options {
 			public String getValueString() { return resolution.toString(); }
 
 			@Override
-			public void click(GameContainer container) {
+			public void click(OpsuClient container) {
 				do {
 					resolution = resolution.next();
 				} while (resolution != Resolution.RES_800_600 &&
-						(container.getScreenWidth() < resolution.getWidth() ||
-						 container.getScreenHeight() < resolution.getHeight()));
+						(container.getMaxWidth() < resolution.getWidth() ||
+						 container.getMaxHeight() < resolution.getHeight()));
 			}
 		},
 //		FULLSCREEN ("Fullscreen Mode", "Restart to apply changes.", false),
@@ -170,7 +169,7 @@ public class Options {
 			public String getValueString() { return skinName; }
 
 			@Override
-			public void click(GameContainer container) {
+			public void click(OpsuClient container) {
 				skinDirIndex = (skinDirIndex + 1) % skinDirs.length;
 				skinName = skinDirs[skinDirIndex];
 			}
@@ -182,7 +181,7 @@ public class Options {
 			}
 
 			@Override
-			public void click(GameContainer container) {
+			public void click(OpsuClient container) {
 				targetFPSindex = (targetFPSindex + 1) % targetFPS.length;
 				container.setTargetFrameRate(getTargetFPS());
 				container.setVSync(getTargetFPS() == 60);
@@ -190,14 +189,14 @@ public class Options {
 		},
 		MASTER_VOLUME ("Master Volume", "Global volume level.", 35, 0, 100) {
 			@Override
-			public void drag(GameContainer container, int d) {
+			public void drag(OpsuClient container, int d) {
 				super.drag(container, d);
 				container.setMusicVolume(getMasterVolume() * getMusicVolume());
 			}
 		},
 		MUSIC_VOLUME ("Music Volume", "Volume of music.", 80, 0, 100) {
 			@Override
-			public void drag(GameContainer container, int d) {
+			public void drag(OpsuClient container, int d) {
 				super.drag(container, d);
 				container.setMusicVolume(getMasterVolume() * getMusicVolume());
 			}
@@ -213,7 +212,7 @@ public class Options {
 			public String getValueString() { return screenshotFormat[screenshotFormatIndex].toUpperCase(); }
 
 			@Override
-			public void click(GameContainer container) { screenshotFormatIndex = (screenshotFormatIndex + 1) % screenshotFormat.length; }
+			public void click(OpsuClient container) { screenshotFormatIndex = (screenshotFormatIndex + 1) % screenshotFormat.length; }
 		},
 		SHOW_FPS ("Show FPS Counter", "Show an FPS counter in the bottom-right hand corner.", true),
 		SHOW_HIT_LIGHTING ("Show Hit Lighting", "Adds an effect behind hit explosions.", true),
@@ -222,7 +221,7 @@ public class Options {
 		SHOW_FOLLOW_POINTS ("Show Follow Points", "Whether to show follow points between hit objects.", true),
 		NEW_CURSOR ("Enable New Cursor", "Use the new cursor style (may cause higher CPU usage).", true) {
 			@Override
-			public void click(GameContainer container) {
+			public void click(OpsuClient container) {
 				super.click(container);
 				UI.getCursor().reset();
 			}
@@ -268,17 +267,9 @@ public class Options {
 		},
 		SHOW_UNICODE ("Prefer Non-English Metadata", "Where available, song titles will be shown in their native language.", false) {
 			@Override
-			public void click(GameContainer container) {
+			public void click(OpsuClient container) {
 				super.click(container);
-				if (bool) {
-					try {
-						Utils.FONT_LARGE.loadGlyphs();
-						Utils.FONT_MEDIUM.loadGlyphs();
-						Utils.FONT_DEFAULT.loadGlyphs();
-					} catch (SlickException e) {
-						Log.warn("Failed to load glyphs.", e);
-					}
-				}
+				container.setPreferNonEnglish(bool);
 			}
 		},
 		ENABLE_THEME_SONG ("Enable Theme Song", "Whether to play the theme song upon starting opsu!", true),
@@ -397,7 +388,7 @@ public class Options {
 		 * By default, this inverts the current {@code bool} field.
 		 * @param container the game container
 		 */
-		public void click(GameContainer container) { bool = !bool; }
+		public void click(OpsuClient container) { bool = !bool; }
 
 		/**
 		 * Processes a mouse drag action (via override).
@@ -407,7 +398,7 @@ public class Options {
 		 * @param container the game container
 		 * @param d the dragged distance (modified by multiplier)
 		 */
-		public void drag(GameContainer container, int d) {
+		public void drag(OpsuClient container, int d) {
 			if (isNumeric)
 				val = Utils.getBoundedValue(val, d, min, max);
 		}
@@ -514,7 +505,7 @@ public class Options {
 	 * bar notification about the action.
 	 * @param container the game container
 	 */
-	public static void setNextFPS(GameContainer container) {
+	public static void setNextFPS(OpsuClient container) {
 		GameOption.TARGET_FPS.click(container);
 		UI.sendBarNotification(String.format("Frame limiter: %s", GameOption.TARGET_FPS.getValueString()));
 	}
@@ -530,7 +521,7 @@ public class Options {
 	 * @param container the game container
 	 * @param volume the volume [0, 1]
 	 */
-	public static void setMasterVolume(GameContainer container, float volume) {
+	public static void setMasterVolume(OpsuClient container, float volume) {
 		if (volume >= 0f && volume <= 1f) {
 			GameOption.MASTER_VOLUME.setValue((int) (volume * 100f));
 			MusicController.setVolume(getMasterVolume() * getMusicVolume());
@@ -575,17 +566,18 @@ public class Options {
 	 * available resolution will be used.
 	 * @param app the game container
 	 */
-	public static void setDisplayMode(Container app) {
-		int screenWidth = app.getScreenWidth();
-		int screenHeight = app.getScreenHeight();
+	public static void setDisplayMode(DisplayDevice app) {
+		int screenWidth = app.getMaxWidth();
+		int screenHeight = app.getMaxHeight();
 
 		// check for larger-than-screen dimensions
 		if (screenWidth < resolution.getWidth() || screenHeight < resolution.getHeight())
-			resolution = Resolution.RES_800_600;
-
+			//@TODO: consider adding a getDefaultRes() to DisplayDevice
+                        //or fully move the range-checking to setDisplayResolution()
+                        resolution = Resolution.RES_800_600;
 		try {
-			app.setDisplayMode(resolution.getWidth(), resolution.getHeight(), false);
-		} catch (SlickException e) {
+			app.setDisplayResolution(resolution.getWidth(), resolution.getHeight());
+		} catch (RuntimeException e) {
 			ErrorHandler.error("Failed to set display mode.", e, true);
 		}
 

@@ -18,6 +18,7 @@
 
 package itdelatrisu.opsu;
 
+import itdelatrisu.opsu.log.Log;
 import itdelatrisu.opsu.audio.SoundController;
 import itdelatrisu.opsu.audio.SoundEffect;
 import itdelatrisu.opsu.beatmap.HitObject;
@@ -61,7 +62,6 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.Animation;
 import org.newdawn.slick.Color;
-import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.UnicodeFont;
@@ -71,6 +71,7 @@ import org.newdawn.slick.state.StateBasedGame;
 import org.newdawn.slick.util.ResourceLoader;
 
 import com.sun.jna.platform.FileUtils;
+import org.newdawn.slick.GameContainer;
 
 /**
  * Contains miscellaneous utilities.
@@ -191,7 +192,8 @@ public class Utils {
 		DownloadNode.init(width, height);
 
 		// initialize UI components
-		UI.init(container, game);
+                //@TODO remove downcast
+		UI.init((Container)container, game);
 	}
 
 	/**
