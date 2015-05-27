@@ -30,9 +30,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.ServerSocket;
-import org.newdawn.slick.util.FileSystemLocation;
 
-import org.newdawn.slick.util.ResourceLoader;
 
 /**
  * Opsu Startup class that initializes the log and configuration systems and

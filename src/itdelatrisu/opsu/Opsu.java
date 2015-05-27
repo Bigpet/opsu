@@ -140,7 +140,7 @@ public class Opsu extends StateBasedGame {
         
         @Override
         public void keyPressed(int key, char c)
-        {
+        {   
             switch(key)
             {
                 case Input.KEY_F7:

@@ -20,6 +20,7 @@ package itdelatrisu.opsu.audio;
 
 import itdelatrisu.opsu.ErrorHandler;
 import itdelatrisu.opsu.Options;
+import itdelatrisu.opsu.ResourceLoader;
 import itdelatrisu.opsu.audio.HitSound.SampleSet;
 import itdelatrisu.opsu.beatmap.HitObject;
 
@@ -37,7 +38,6 @@ import javax.sound.sampled.LineListener;
 import javax.sound.sampled.LineUnavailableException;
 
 import org.newdawn.slick.SlickException;
-import org.newdawn.slick.util.ResourceLoader;
 
 /**
  * Controller for all (non-music) sound components.

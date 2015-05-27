@@ -38,11 +38,6 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
-import org.lwjgl.input.Keyboard;
-import org.newdawn.slick.Input;
-import org.newdawn.slick.util.ClasspathLocation;
-import org.newdawn.slick.util.FileSystemLocation;
-import org.newdawn.slick.util.ResourceLoader;
 
 /**
  * Handles all user options.
@@ -259,11 +254,11 @@ public class Options {
 				(System.getProperty("os.name").toLowerCase().indexOf("linux") > -1)),
 		KEY_LEFT ("Left Game Key", "Select this option to input a key.") {
 			@Override
-			public String getValueString() { return Keyboard.getKeyName(getGameKeyLeft()); }
+			public String getValueString() { return Input.getKeyName(getGameKeyLeft()); }
 		},
 		KEY_RIGHT ("Right Game Key", "Select this option to input a key.") {
 			@Override
-			public String getValueString() { return Keyboard.getKeyName(getGameKeyRight()); }
+			public String getValueString() { return Input.getKeyName(getGameKeyRight()); }
 		},
 		SHOW_UNICODE ("Prefer Non-English Metadata", "Where available, song titles will be shown in their native language.", false) {
 			@Override
@@ -488,8 +483,8 @@ public class Options {
 
 	/** Left and right game keys. */
 	private static int
-		keyLeft  = Keyboard.KEY_NONE,
-		keyRight = Keyboard.KEY_NONE;
+		keyLeft  = Input.KEY_NONE,
+		keyRight = Input.KEY_NONE;
 
 	// This class should not be instantiated.
 	private Options() {}
@@ -764,7 +759,7 @@ public class Options {
 	 * @return the left key code
 	 */
 	public static int getGameKeyLeft() {
-		if (keyLeft == Keyboard.KEY_NONE)
+		if (keyLeft == Input.KEY_NONE)
 			setGameKeyLeft(Input.KEY_Z);
 		return keyLeft;
 	}
@@ -774,7 +769,7 @@ public class Options {
 	 * @return the right key code
 	 */
 	public static int getGameKeyRight() {
-		if (keyRight == Keyboard.KEY_NONE)
+		if (keyRight == Input.KEY_NONE)
 			setGameKeyRight(Input.KEY_X);
 		return keyRight;
 	}
@@ -787,7 +782,7 @@ public class Options {
 	 * @return {@code true} if the key was set, {@code false} if it was rejected
 	 */
 	public static boolean setGameKeyLeft(int key) {
-		if ((key == keyRight && key != Keyboard.KEY_NONE) || !isValidGameKey(key))
+		if ((key == keyRight && key != Input.KEY_NONE) || !isValidGameKey(key))
 			return false;
 		keyLeft = key;
 		return true;
@@ -801,7 +796,7 @@ public class Options {
 	 * @return {@code true} if the key was set, {@code false} if it was rejected
 	 */
 	public static boolean setGameKeyRight(int key) {
-		if ((key == keyLeft && key != Keyboard.KEY_NONE) || !isValidGameKey(key))
+		if ((key == keyLeft && key != Input.KEY_NONE) || !isValidGameKey(key))
 			return false;
 		keyRight = key;
 		return true;
@@ -813,9 +808,9 @@ public class Options {
 	 * @return {@code true} if valid, {@code false} otherwise
 	 */
 	private static boolean isValidGameKey(int key) {
-		return (key != Keyboard.KEY_ESCAPE && key != Keyboard.KEY_SPACE &&
-		        key != Keyboard.KEY_UP && key != Keyboard.KEY_DOWN &&
-		        key != Keyboard.KEY_F7 && key != Keyboard.KEY_F10 && key != Keyboard.KEY_F12);
+		return (key != Input.KEY_ESCAPE && key != Input.KEY_SPACE &&
+		        key != Input.KEY_UP && key != Input.KEY_DOWN &&
+		        key != Input.KEY_F7 && key != Input.KEY_F10 && key != Input.KEY_F12);
 	}
 
 	/**
@@ -1085,10 +1080,10 @@ public class Options {
 						GameOption.DISABLE_SOUNDS.setValue(Boolean.parseBoolean(value));
 						break;
 					case "keyOsuLeft":
-						setGameKeyLeft(Keyboard.getKeyIndex(value));
+						setGameKeyLeft(Input.getKeyIndex(value));
 						break;
 					case "keyOsuRight":
-						setGameKeyRight(Keyboard.getKeyIndex(value));
+						setGameKeyRight(Input.getKeyIndex(value));
 						break;
 					case "MouseDisableWheel":
 						GameOption.DISABLE_MOUSE_WHEEL.setValue(Boolean.parseBoolean(value));
@@ -1217,9 +1212,9 @@ public class Options {
 			writer.newLine();
 			writer.write(String.format("DisableSound = %b", isSoundDisabled()));
 			writer.newLine();
-			writer.write(String.format("keyOsuLeft = %s", Keyboard.getKeyName(getGameKeyLeft())));
+			writer.write(String.format("keyOsuLeft = %s", Input.getKeyName(getGameKeyLeft())));
 			writer.newLine();
-			writer.write(String.format("keyOsuRight = %s", Keyboard.getKeyName(getGameKeyRight())));
+			writer.write(String.format("keyOsuRight = %s", Input.getKeyName(getGameKeyRight())));
 			writer.newLine();
 			writer.write(String.format("MouseDisableWheel = %b", isMouseWheelDisabled()));
 			writer.newLine();

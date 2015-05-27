@@ -20,6 +20,7 @@ package itdelatrisu.opsu.downloads;
 
 import itdelatrisu.opsu.ErrorHandler;
 import itdelatrisu.opsu.Options;
+import itdelatrisu.opsu.ResourceLoader;
 import itdelatrisu.opsu.Utils;
 import itdelatrisu.opsu.downloads.Download.DownloadListener;
 import itdelatrisu.opsu.ui.UI;
@@ -35,7 +36,6 @@ import java.util.Locale;
 import java.util.Properties;
 
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
-import org.newdawn.slick.util.ResourceLoader;
 
 /**
  * Handles automatic program updates.
