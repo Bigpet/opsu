@@ -20,7 +20,7 @@ package itdelatrisu.opsu.downloads;
 
 import itdelatrisu.opsu.ErrorHandler;
 import itdelatrisu.opsu.Options;
-import itdelatrisu.opsu.ResourceLoader;
+import itdelatrisu.opsu.slickreplace.ResourceLoader;
 import itdelatrisu.opsu.Utils;
 import itdelatrisu.opsu.downloads.Download.DownloadListener;
 import itdelatrisu.opsu.ui.UI;

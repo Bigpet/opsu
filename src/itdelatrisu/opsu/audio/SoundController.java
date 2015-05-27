@@ -20,7 +20,7 @@ package itdelatrisu.opsu.audio;
 
 import itdelatrisu.opsu.ErrorHandler;
 import itdelatrisu.opsu.Options;
-import itdelatrisu.opsu.ResourceLoader;
+import itdelatrisu.opsu.slickreplace.ResourceLoader;
 import itdelatrisu.opsu.audio.HitSound.SampleSet;
 import itdelatrisu.opsu.beatmap.HitObject;
 

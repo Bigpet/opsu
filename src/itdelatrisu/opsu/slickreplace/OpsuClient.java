@@ -15,16 +15,18 @@
  *  You should have received a copy of the GNU General Public License
  *  along with opsu!.  If not, see <http://www.gnu.org/licenses/>.
  */
-package itdelatrisu.opsu;
-
-import java.io.InputStream;
-import java.net.URL;
+package itdelatrisu.opsu.slickreplace;
 
 /**
  *
  * @author Bigpet {@literal <dravorek@gmail.com>}
  */
-public interface ResourceLocation {
-    public URL getResource(String res);
-    public InputStream getResourceAsStream(String res);
+public interface OpsuClient extends DisplayDevice {
+    //@TODO: remove this, and figure out a way to either send generic "Option changed"
+    //events to the client or to re-evalute what the SlickClient does here
+    public void setPreferNonEnglish(boolean preferNonEnglish);
+    
+    public void setMusicVolume(float volume);
+    public void setTargetFrameRate(int limit);
+    public void setVSync(boolean enable);
 }

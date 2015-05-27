@@ -18,6 +18,8 @@
 
 package itdelatrisu.opsu;
 
+import itdelatrisu.opsu.slickreplace.ResourceLoader;
+import itdelatrisu.opsu.slickreplace.FileSystemLocation;
 import itdelatrisu.opsu.log.Log;
 import itdelatrisu.opsu.log.DefaultLogSystem;
 import static itdelatrisu.opsu.Opsu.close;

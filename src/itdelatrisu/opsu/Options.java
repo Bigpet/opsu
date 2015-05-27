@@ -18,6 +18,11 @@
 
 package itdelatrisu.opsu;
 
+import itdelatrisu.opsu.slickreplace.DisplayDevice;
+import itdelatrisu.opsu.slickreplace.OpsuClient;
+import itdelatrisu.opsu.slickreplace.ResourceLoader;
+import itdelatrisu.opsu.slickreplace.ClasspathLocation;
+import itdelatrisu.opsu.slickreplace.FileSystemLocation;
 import itdelatrisu.opsu.log.Log;
 import itdelatrisu.opsu.audio.MusicController;
 import itdelatrisu.opsu.beatmap.Beatmap;

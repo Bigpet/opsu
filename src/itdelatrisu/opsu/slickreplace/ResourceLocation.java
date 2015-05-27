@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with opsu!.  If not, see <http://www.gnu.org/licenses/>.
  */
-package itdelatrisu.opsu;
+package itdelatrisu.opsu.slickreplace;
 
 import java.io.InputStream;
 import java.net.URL;
@@ -24,23 +24,7 @@ import java.net.URL;
  *
  * @author Bigpet {@literal <dravorek@gmail.com>}
  */
-public class ClasspathLocation implements ResourceLocation {
-    
-    ClassLoader loader;
-    
-    public ClasspathLocation()
-    {
-        loader = ClasspathLocation.class.getClassLoader();
-    }
-    
-    @Override
-    public URL getResource(String res) {
-        return loader.getResource(res);
-    }
-
-    @Override
-    public InputStream getResourceAsStream(String res) {
-        return loader.getResourceAsStream(res);
-    }
-    
+public interface ResourceLocation {
+    public URL getResource(String res);
+    public InputStream getResourceAsStream(String res);
 }

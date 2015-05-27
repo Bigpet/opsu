@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with opsu!.  If not, see <http://www.gnu.org/licenses/>.
  */
-package itdelatrisu.opsu;
+package itdelatrisu.opsu.slickreplace;
 
 /**
  *
