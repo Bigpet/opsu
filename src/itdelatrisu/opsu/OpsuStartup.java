@@ -18,6 +18,7 @@
 
 package itdelatrisu.opsu;
 
+import itdelatrisu.opsu.Ex.OpsuEx;
 import itdelatrisu.opsu.slickreplace.ResourceLoader;
 import itdelatrisu.opsu.slickreplace.FileSystemLocation;
 import itdelatrisu.opsu.log.Log;
@@ -111,7 +112,9 @@ public class OpsuStartup {
         try {
             // loop until force exit
             if (Options.isExperimentalGUI()) {
-                Log.error("I regret nothing");
+                System.setProperty("newt.window.icons", "icon16.png icon32.png");
+                OpsuEx opsu = new OpsuEx();
+                opsu.start();
             } else {
                 while (true) {
                     Opsu opsu = new Opsu("opsu!");
