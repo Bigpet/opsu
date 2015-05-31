@@ -110,23 +110,27 @@ public class OpsuStartup {
         // start the game
         try {
             // loop until force exit
-            while (true) {
-                Opsu opsu = new Opsu("opsu!");
-                Container app = new Container(opsu);
+            if (Options.isExperimentalGUI()) {
+                Log.error("I regret nothing");
+            } else {
+                while (true) {
+                    Opsu opsu = new Opsu("opsu!");
+                    Container app = new Container(opsu);
 
-                // basic game settings
-                Options.setDisplayMode(app);
-                String[] icons = {"icon16.png", "icon32.png"};
-                app.setIcons(icons);
-                app.setForceExit(true);
+                    // basic game settings
+                    Options.setDisplayMode(app);
+                    String[] icons = {"icon16.png", "icon32.png"};
+                    app.setIcons(icons);
+                    app.setForceExit(true);
 
-                app.start();
+                    app.start();
 
-                // run update if available
-                if (Updater.get().getStatus() == Updater.Status.UPDATE_FINAL) {
-                    close();
-                    Updater.get().runUpdate();
-                    break;
+                    // run update if available
+                    if (Updater.get().getStatus() == Updater.Status.UPDATE_FINAL) {
+                        close();
+                        Updater.get().runUpdate();
+                        break;
+                    }
                 }
             }
         } catch (Exception e) {

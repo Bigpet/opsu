@@ -53,6 +53,7 @@ public class OptionsMenu extends BasicGameState {
 		DISPLAY ("Display", new GameOption[] {
 			GameOption.SCREEN_RESOLUTION,
 //			GameOption.FULLSCREEN,
+                        GameOption.USE_SLICKLESS,
 			GameOption.SKIN,
 			GameOption.TARGET_FPS,
 			GameOption.SHOW_FPS,

@@ -163,6 +163,7 @@ public class Options {
 						 container.getMaxHeight() < resolution.getHeight()));
 			}
 		},
+                USE_SLICKLESS("Beta UI", "Restart (Ctrl+Shift+F5) to apply changes", false),
 //		FULLSCREEN ("Fullscreen Mode", "Restart to apply changes.", false),
 		SKIN ("Skin", "Restart (Ctrl+Shift+F5) to apply skin changes.") {
 			@Override
@@ -461,7 +462,7 @@ public class Options {
 
 	/** Current screen resolution. */
 	private static Resolution resolution = Resolution.RES_1024_768;
-
+        
 	/** The available skin directories. */
 	private static String[] skinDirs;
 
@@ -592,6 +593,17 @@ public class Options {
 //	 */
 //	public static boolean isFullscreen() { return fullscreen; }
 
+        /**
+         * Checks if the option for the experimental UI (without Slick2D) is enabled.
+         * This status does not reflect whether or not the experimental UI is currently
+         * active. It merely informs which UI will be chosen the next time Opsu! starts
+         * if the setting remains unchanged until the next restart.
+         * @return true if the experimental GUI will be used on next startup
+         */
+        public static boolean isExperimentalGUI() {
+            return GameOption.USE_SLICKLESS.getBooleanValue();
+        }
+        
 	/**
 	 * Returns whether or not the FPS counter display is enabled.
 	 * @return true if enabled
@@ -1026,6 +1038,9 @@ public class Options {
 //					case "Fullscreen":
 //						GameOption.FULLSCREEN.setValue(Boolean.parseBoolean(value));
 //						break;
+                                        case "ExperimentalGUI":
+                                            GameOption.USE_SLICKLESS.setValue(Boolean.parseBoolean(value));
+                                            break;
 					case "Skin":
 						skinName = value;
 						break;
@@ -1189,6 +1204,8 @@ public class Options {
 			writer.newLine();
 //			writer.write(String.format("Fullscreen = %b", isFullscreen()));
 //			writer.newLine();
+			writer.write(String.format("ExperimentalGUI = %b", GameOption.USE_SLICKLESS.getBooleanValue()));
+			writer.newLine();
 			writer.write(String.format("Skin = %s", skinName));
 			writer.newLine();
 			writer.write(String.format("FrameSync = %d", targetFPS[targetFPSindex]));
