@@ -16,8 +16,13 @@
  * along with opsu!.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package itdelatrisu.opsu;
+package itdelatrisu.opsu.platform.slick;
 
+import itdelatrisu.opsu.Container;
+import itdelatrisu.opsu.GameData;
+import itdelatrisu.opsu.OpsuStartup;
+import itdelatrisu.opsu.Options;
+import itdelatrisu.opsu.Utils;
 import itdelatrisu.opsu.audio.MusicController;
 import itdelatrisu.opsu.downloads.DownloadList;
 import itdelatrisu.opsu.downloads.Updater;
@@ -82,14 +87,6 @@ public class Opsu extends StateBasedGame {
 		addState(new DownloadsMenu(STATE_DOWNLOADSMENU));
                 //@TODO: remove this
                 initedContainer = (Container) container;
-	}
-
-	/**
-         * @TODO: Remove this method. the one in OpsuStartup should be all that's necessary
-	 * Launches opsu!.
-	 */
-	public static void main(String[] args) {
-		OpsuStartup.main(args);
 	}
 
 	@Override

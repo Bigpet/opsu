@@ -20,7 +20,7 @@ package itdelatrisu.opsu.states;
 
 import itdelatrisu.opsu.ErrorHandler;
 import itdelatrisu.opsu.GameImage;
-import itdelatrisu.opsu.Opsu;
+import itdelatrisu.opsu.platform.slick.Opsu;
 import itdelatrisu.opsu.Options;
 import itdelatrisu.opsu.Utils;
 import itdelatrisu.opsu.audio.MusicController;

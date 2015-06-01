@@ -18,12 +18,13 @@
 
 package itdelatrisu.opsu;
 
-import itdelatrisu.opsu.Ex.OpsuEx;
+import itdelatrisu.opsu.platform.slick.Opsu;
+import itdelatrisu.opsu.platform.jogl.OpsuEx;
 import itdelatrisu.opsu.slickreplace.ResourceLoader;
 import itdelatrisu.opsu.slickreplace.FileSystemLocation;
 import itdelatrisu.opsu.log.Log;
 import itdelatrisu.opsu.log.DefaultLogSystem;
-import static itdelatrisu.opsu.Opsu.close;
+import static itdelatrisu.opsu.platform.slick.Opsu.close;
 import itdelatrisu.opsu.db.DBController;
 import itdelatrisu.opsu.downloads.DownloadList;
 import itdelatrisu.opsu.downloads.Updater;

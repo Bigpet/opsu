@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with opsu!.  If not, see <http://www.gnu.org/licenses/>.
  */
-package itdelatrisu.opsu.Ex;
+package itdelatrisu.opsu.platform.jogl;
 
 import com.jogamp.newt.event.WindowAdapter;
 import com.jogamp.newt.event.WindowEvent;

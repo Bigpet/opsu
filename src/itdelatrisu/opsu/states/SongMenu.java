@@ -22,7 +22,7 @@ import itdelatrisu.opsu.GameData;
 import itdelatrisu.opsu.GameData.Grade;
 import itdelatrisu.opsu.GameImage;
 import itdelatrisu.opsu.GameMod;
-import itdelatrisu.opsu.Opsu;
+import itdelatrisu.opsu.platform.slick.Opsu;
 import itdelatrisu.opsu.Options;
 import itdelatrisu.opsu.OszUnpacker;
 import itdelatrisu.opsu.ScoreData;

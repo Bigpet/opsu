@@ -15,18 +15,14 @@
  *  You should have received a copy of the GNU General Public License
  *  along with opsu!.  If not, see <http://www.gnu.org/licenses/>.
  */
-package itdelatrisu.opsu.slickreplace;
+package itdelatrisu.opsu.platform;
 
 /**
  *
  * @author Bigpet {@literal <dravorek@gmail.com>}
  */
-public interface OpsuClient extends DisplayDevice {
-    //@TODO: remove this, and figure out a way to either send generic "Option changed"
-    //events to the client or to re-evalute what the SlickClient does here
-    public void setPreferNonEnglish(boolean preferNonEnglish);
-    
-    public void setMusicVolume(float volume);
-    public void setTargetFrameRate(int limit);
-    public void setVSync(boolean enable);
+public interface DisplayDevice {
+    public int getMaxWidth();
+    public int getMaxHeight();
+    public void setDisplayResolution(int width, int height);
 }

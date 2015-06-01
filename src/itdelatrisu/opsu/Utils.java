@@ -18,6 +18,7 @@
 
 package itdelatrisu.opsu;
 
+import itdelatrisu.opsu.platform.slick.Opsu;
 import itdelatrisu.opsu.slickreplace.ResourceLoader;
 import itdelatrisu.opsu.log.Log;
 import itdelatrisu.opsu.audio.SoundController;

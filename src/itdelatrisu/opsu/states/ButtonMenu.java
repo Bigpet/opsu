@@ -20,7 +20,7 @@ package itdelatrisu.opsu.states;
 
 import itdelatrisu.opsu.GameImage;
 import itdelatrisu.opsu.GameMod;
-import itdelatrisu.opsu.Opsu;
+import itdelatrisu.opsu.platform.slick.Opsu;
 import itdelatrisu.opsu.Options;
 import itdelatrisu.opsu.ScoreData;
 import itdelatrisu.opsu.Utils;

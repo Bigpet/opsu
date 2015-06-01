@@ -70,7 +70,7 @@
 								<argument>-Djava.library.path=${project.build.directory}/natives</argument>
 								<argument>-cp</argument>
 								<classpath />
-								<argument>itdelatrisu.opsu.Opsu</argument>
+								<argument>itdelatrisu.opsu.OpsuStartup</argument>
 							</arguments>
 						</configuration>
 					</execution>
@@ -86,7 +86,7 @@
 							<arguments>
 								<argument>-jar</argument>
 								<argument>-Dinput=opsu-${project.version}.jar</argument>
-								<argument>-Dmain=itdelatrisu.opsu.Opsu</argument>
+								<argument>-Dmain=itdelatrisu.opsu.OpsuStartup</argument>
 								<argument>-Doutput=opsu-${project.version}-runnable.jar</argument>
 								<!-- uncomment the line below to use XDG base directories in Unix -->
 								<!--<argument>-Dparams=-DXDG=true</argument>-->

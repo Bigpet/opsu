@@ -18,8 +18,8 @@
 
 package itdelatrisu.opsu;
 
-import itdelatrisu.opsu.slickreplace.DisplayDevice;
-import itdelatrisu.opsu.slickreplace.OpsuClient;
+import itdelatrisu.opsu.platform.DisplayDevice;
+import itdelatrisu.opsu.platform.OpsuClient;
 import itdelatrisu.opsu.slickreplace.ResourceLoader;
 import itdelatrisu.opsu.slickreplace.ClasspathLocation;
 import itdelatrisu.opsu.slickreplace.FileSystemLocation;

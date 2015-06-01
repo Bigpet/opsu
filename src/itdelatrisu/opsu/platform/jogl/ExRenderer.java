@@ -15,13 +15,14 @@
  *  You should have received a copy of the GNU General Public License
  *  along with opsu!.  If not, see <http://www.gnu.org/licenses/>.
  */
-package itdelatrisu.opsu.Ex;
+package itdelatrisu.opsu.platform.jogl;
 
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLEventListener;
-import sun.security.krb5.JavaxSecurityAuthKerberosAccess;
+import com.jogamp.opengl.util.awt.TextRenderer;
+import java.awt.Font;
 
 /**
  *
@@ -29,10 +30,10 @@ import sun.security.krb5.JavaxSecurityAuthKerberosAccess;
  */
 public class ExRenderer implements GLEventListener  {
     float theta = 0.0f;
-    
+    TextRenderer render;
     @Override
     public void init(GLAutoDrawable glad) {
-        
+        render = new TextRenderer(new Font("Sans Serif",Font.PLAIN,50),true,true);
     }
 
     @Override
@@ -66,7 +67,10 @@ public class ExRenderer implements GLEventListener  {
         gl.glColor3f(0, 0, 1);
         gl.glVertex2d(sine, -sine);
         gl.glEnd();
-
+        render.beginRendering(500, 500);
+        render.setColor(1f, 1f, 1f, 1f);
+        render.draw("testing",1,1);
+        render.endRendering();
         update();
     }
 
