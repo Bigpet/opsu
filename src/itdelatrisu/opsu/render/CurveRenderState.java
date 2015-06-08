@@ -179,7 +179,7 @@ public class CurveRenderState {
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_TEXTURE_1D);
 		GL11.glBindTexture(GL11.GL_TEXTURE_1D, staticState.gradientTexture);
-		GL11.glTexParameteri(GL11.GL_TEXTURE_1D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR_MIPMAP_LINEAR);
+		GL11.glTexParameteri(GL11.GL_TEXTURE_1D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
 		GL11.glTexParameteri(GL11.GL_TEXTURE_1D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
 		GL11.glTexParameteri(GL11.GL_TEXTURE_1D, GL11.GL_TEXTURE_WRAP_S, GL11.GL_CLAMP);
 		
@@ -297,7 +297,7 @@ public class CurveRenderState {
 		y = offy - y1 / divy;
 		buff.put(x);
 		buff.put(y);
-		buff.put(0f);
+		buff.put(0.1f);
 		buff.put(1f);
 		//GL11.glVertex4f(x, y, 0.0f, 1.0f);
 		for (int j = 0; j < DIVIDES; ++j) {
@@ -309,7 +309,7 @@ public class CurveRenderState {
 			y = (y1 + radius * (float) Math.cos(phase)) / divy;
 			buff.put((offx + x));
 			buff.put((offy - y));
-			buff.put(1f);
+			buff.put(0.9f);
 			buff.put(1f);
 			//GL11.glVertex4f(x + 90 * (float) Math.sin(phase), y + 90 * (float) Math.cos(phase), 1.0f, 1.0f);
 		}
@@ -320,7 +320,7 @@ public class CurveRenderState {
 		y = (y1 + radius * (float) Math.cos(0.0)) / divy;
 		buff.put((offx + x));
 		buff.put((offy - y));
-		buff.put(1f);
+		buff.put(0.9f);
 		buff.put(1f);
 		//GL11.glVertex4f(x + 90 * (float) Math.sin(0.0), y + 90 * (float) Math.cos(0.0), 1.0f, 1.0f);
 	}
